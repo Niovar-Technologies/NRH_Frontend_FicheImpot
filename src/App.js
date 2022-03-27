@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Route, Switch, Router } from "react-router-dom"
-import TalonDePaie from './Components/TalonDePaie'
+import FicheImpot from './Components/FicheImpot'
 import "./static/css/style.css"
 import "./static/css/bootstrap.min.css"
 
@@ -12,9 +12,9 @@ const testApp = () => (<div>Hello React!</div>)
 export default () => {
     return (
 	<>
-		<TalonDePaie />
+		<FicheImpot />
         <Router history={history}>
-			<Route path='/talons-de-paie' component={testApp} />
+			<Route path='/test' component={testApp} />
         </Router>
 	</>
     )
