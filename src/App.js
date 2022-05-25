@@ -1,22 +1,22 @@
-import React from 'react';
+import {Route, Routes} from "react-router-dom";
 
-import { Route, Switch, Router } from "react-router-dom"
-import FicheImpot from './Components/FicheImpot'
-import "./static/css/style.css"
 import "./static/css/bootstrap.min.css"
+import "./static/css/bootstrap-datetimepicker.min.css"
+import "./static/css/select2.min.css"
+import "./static/css/style.css"
 
-import { createBrowserHistory } from 'history'
-const history = createBrowserHistory()
+import FicheImpot from "./Components/FicheImpot";
+import HistoriqueFI from "./Components/HistoriqueFI";
 
-const testApp = () => (<div>Hello React!</div>)
-export default () => {
+
+
+function App() {
     return (
-	<>
-		<FicheImpot />
-        <Router history={history}>
-			<Route path='/test' component={testApp} />
-        </Router>
-	</>
-    )
+        <Routes>
+            <Route exact path="/" element={<FicheImpot/>}/>
+            <Route exact path="/historiqueFI/" element={<HistoriqueFI/>}/>
+        </Routes>
+    );
 }
 
+export default App;

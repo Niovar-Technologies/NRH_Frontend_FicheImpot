@@ -1,4 +1,3 @@
-import React from 'react';
 import _logo from '../static/img/logobig.jpeg';
 import clsx from 'clsx';
 import search from "../static/img/search.png";
@@ -13,19 +12,13 @@ import {useEffect, useState} from "react";
 
 const Layout = ({children}) => {
 
-    // const navigate = useNavigate()
+    const navigate = useNavigate()
     const location = useLocation();
 
-    const dashboard_paths = ['/', '/employee-dashboard/'];
-    const employees_paths = ['/employees/', '/employee-teams/', '/employee-offices/', '/add-employees/', '/employee-grid/'];
-    const company_paths = ['/company/'];
-    const leave_paths = ['/leave/'];
-    const report_paths = ['/report/', '/report-personal/', '/leave-report/', '/payroll-report/',
-        '/contact-report/', '/email-report/', '/security-report/', '/wfh-report/'];
-    const manage_paths = ['/manage/', '/leadership-manage/', '/super-admin/'];
-    const settings_paths = ['/settings/', '/settings-timeoff/'];
-    const profile_paths = ['/profile/', '/profile-detail/', '/profile-document/', '/profile-payroll/',
-        '/profile-timeoff/', '/profile-reviews/', '/profile-settings/'];
+    const fiche_impot_paths = ['/'];
+
+    const historique_fiche_paths = ['/historiqueFI/'];
+
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -275,49 +268,20 @@ const Layout = ({children}) => {
                                 </a>
                             </div>
                             <ul>
-                                <li className={dashboard_paths.includes(location.pathname) && "active"}
+                                <li className={fiche_impot_paths.includes(location.pathname) && "active"}
                                     id="sidebar-item">
                                     <a onClick={() => {
                                         window.location.href = "/"
-                                    }}><Home/><span>Dashboard</span></a>
+                                    }}><Home/><span>Fiche d'impot</span></a>
                                 </li>
-                                <li className={employees_paths.includes(location.pathname) && "active"}
-                                    id="sidebar-item">
+   
+                                <li className={historique_fiche_paths.includes(location.pathname) && "active"} id="sidebar-item">
                                     <a onClick={() => {
-                                        navigate('/employees/')
-                                    }}><Users/><span> Employees</span></a>
+                                        navigate('/historiqueFI/')
+                                    }}><User/><span>Historique fiche impot</span></a>
                                 </li>
-                                <li className={company_paths.includes(location.pathname) && "active"} id="sidebar-item">
-                                    <a onClick={() => {
-                                        navigate('/company/')
-                                    }}><Database/> <span> Company</span></a>
-                                </li>
-                                <li className={leave_paths.includes(location.pathname) && "active"} id="sidebar-item">
-                                    <a onClick={() => {
-                                        navigate('/leave/')
-                                    }}><Briefcase/> <span>Leave</span></a>
-                                </li>
-                                <li className={report_paths.includes(location.pathname) && "active"} id="sidebar-item">
-                                    <a onClick={() => {
-                                        navigate('/report/')
-                                    }}><FileText/><span>Report</span></a>
-                                </li>
-                                <li className={manage_paths.includes(location.pathname) && "active"} id="sidebar-item">
-                                    <a onClick={() => {
-                                        navigate('/manage/')
-                                    }}><RefreshCw/><span>Manage</span></a>
-                                </li>
-                                <li className={settings_paths.includes(location.pathname) && "active"}
-                                    id="sidebar-item">
-                                    <a onClick={() => {
-                                        navigate('/settings/')
-                                    }}><Settings/><span>Settings</span></a>
-                                </li>
-                                <li className={profile_paths.includes(location.pathname) && "active"} id="sidebar-item">
-                                    <a onClick={() => {
-                                        navigate('/profile/')
-                                    }}><User/><span>Profile</span></a>
-                                </li>
+                               
+                        
                             </ul>
                         </div>
                     </div>
