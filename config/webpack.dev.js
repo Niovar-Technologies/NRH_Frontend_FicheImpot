@@ -11,7 +11,7 @@ const devConfig = {
        publicPath: 'http://35.183.210.127:8093/',
     },
     devServer: {
-        port: 8098,
+        port: 8093,
         host: '0.0.0.0',
         historyApiFallback: {
             index: '/index.html'
