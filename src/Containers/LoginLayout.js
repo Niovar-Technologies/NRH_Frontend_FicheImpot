@@ -1,3 +1,4 @@
+import React from 'react'
 const LoginLayout = ({children}) => {
     return (
         <div className="main-wrapper login-body">
