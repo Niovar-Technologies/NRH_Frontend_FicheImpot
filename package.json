@@ -20,6 +20,7 @@
     "react-redux": "^7.2.6",
     "react-router-dom": "^5.3.0",
     "react-router-redux": "^4.0.8",
+	"react-bootstrap": "^2.2.1",
     "style-loader": "^3.3.1",
     "universal-cookie": "^4.0.4",
 	"react-badges": "^1.0.1",
