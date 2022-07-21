@@ -1,4 +1,4 @@
-import Layout from "../Containers/Layout";
+import React from "react";
 
 import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, Upload, ArrowLeft} from "react-feather";
 import {useNavigate} from "react-router-dom";
@@ -18,7 +18,7 @@ import { useAlert } from "react-alert";
 
 //jQuery libraries
  
-import 'jquery/dist/jquery.min.js';
+// import 'jquery/dist/jquery.min.js';
  
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables"
@@ -112,8 +112,6 @@ const Content = () => {
 
   
     return(
-        <Layout>
-
         <div className="page-wrapper">
             <div className="content container-fluid">
                <div className="row">
@@ -195,8 +193,6 @@ const Content = () => {
                 </div>
             </div>
         </div>
-                      
-    </Layout>
     );
 }
 

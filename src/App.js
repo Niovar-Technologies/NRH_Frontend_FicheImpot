@@ -6,7 +6,6 @@ import "./static/css/select2.min.css"
 import "./static/css/style.css"
 
 import FicheImpot from "./Components/FicheImpot";
-import HistoriqueFI from "./Components/HistoriqueFI";
 
 const TestApp = () => (<div>Hello Niovar!</div>)
 
