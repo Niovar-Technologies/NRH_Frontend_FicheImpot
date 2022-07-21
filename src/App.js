@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Route, Routes} from "react-router-dom";
 
 import "./static/css/bootstrap.min.css"
