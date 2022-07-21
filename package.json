@@ -21,7 +21,19 @@
     "react-router-dom": "^5.3.0",
     "react-router-redux": "^4.0.8",
     "style-loader": "^3.3.1",
-    "universal-cookie": "^4.0.4"
+    "universal-cookie": "^4.0.4",
+	"react-badges": "^1.0.1",
+	"axios": "^0.26.1",
+	"clsx": "^1.1.1",
+    "datatables.net-dt": "^1.11.5",
+    "image-webpack-loader": "^8.1.0",
+	"react-alert": "^7.0.3",
+    "react-alert-template-basic": "^1.0.2",
+    "react-hooks-global-state": "^1.0.2",
+    "react-loader-spinner": "^6.0.0-0",
+    "react-scripts": "5.0.0",
+    "react-tooltip": "^4.2.21",
+    "web-vitals": "^2.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
