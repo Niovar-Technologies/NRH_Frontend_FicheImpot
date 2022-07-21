@@ -13,31 +13,7 @@ const TestApp = () => (<div>Hello Niovar!</div>)
 function App() {
     return (
 		<FicheImpot/>
-		<HistoriqueFI/>
     );
 }
 
 export default App;
-
-
-
-
-
-
-
-
-import React from 'react';
-
-import "./static/css/style.css"
-import "./static/css/bootstrap.min.css"
-
-import { Route, Switch, Router, Link } from "react-router-dom"
-import Annees from './Components/Annees'
-
-
-const TestApp = () => (<div>Hello Niovar!</div>)
-export default () => {
-    return (
-		<Annees />
-    )
-} 
