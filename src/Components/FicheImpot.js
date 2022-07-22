@@ -28,14 +28,21 @@ import { createGlobalState } from 'react-hooks-global-state';
 import { Modal } from "react-bootstrap";
 
 
-const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
-//const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserTDPMicroservices/';
+// const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
+const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserFIMicroservices/';
 
 const initialState = { listFile: [], listFileT4: [] } ;
 const { useGlobalState } = createGlobalState(initialState);
 
-const annee = 2022;
-const idEts = 1;
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+
+let idEts = ( cookies.get( 'code_entreprise' ) ) ? cookies.get( 'code_entreprise' ) : "2020"; //
+const jourPaie = ( cookies.get( 'dateJourpaie' ) ) ? transform_date( cookies.get( 'dateJourpaie' ) ) : "2022-06-13";
+const annee = ( cookies.get( 'anneeChoisie' ) ) ? transform_date( cookies.get( 'anneeChoisie' ) ) : "2022-06-13";
+
+// const annee = 2022;
+// const idEts = 1;
 
 class Fichier {
     constructor(id, fichier, extention, type) {
