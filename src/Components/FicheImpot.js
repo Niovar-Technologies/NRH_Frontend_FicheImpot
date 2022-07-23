@@ -227,7 +227,7 @@ const Content = () => {
 { !isloading && 
                 <>
                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
-					<a href="#" class="menuBtn" onClick="handleclick"><Folder/>Historique</a>
+					&nbsp;<a href="#" class="menuBtn" onClick="handleclick"><Folder/>&nbsp;Historique</a>
 				</div>        
                  <div className="col-xl-12 col-sm-12 col-12 mt-2">
                             <div className="card p-2" >
