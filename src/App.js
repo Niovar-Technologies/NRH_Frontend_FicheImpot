@@ -11,10 +11,16 @@ import FicheImpot from "./Components/FicheImpot";
 
 const TestApp = () => (<div>Hello Niovar!</div>)
 
+import { createBrowserHistory } from 'history'
+const history = createBrowserHistory()
+
 function App() {
     return (
-		<FicheImpot/>
+		<Router history={history}>
+			<Route exact path='/' component={FicheImpot} />
+        </Router>
     );
+	
 }
 
 export default App;
