@@ -17,7 +17,7 @@ function App() {
     return (
 		<Router history={history}>
 			<Route exact path='/hello' component={Hello} />
-			<Route exact path='/' component={FicheImpot} />
+			<Route exact path='/fiches-impot' component={FicheImpot} />
         </Router>
     );
 }
