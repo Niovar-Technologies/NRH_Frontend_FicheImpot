@@ -1,6 +1,6 @@
 import React from "react";
 
-import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, Upload, ArrowLeft} from "react-feather";
+import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, Upload, ArrowLeft, Folder} from "react-feather";
 import {useNavigate} from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
 
@@ -87,6 +87,10 @@ const Content = () => {
         fetchData();
     }
     
+	const handleClick = () =>{
+		history.push( '/fiche/loadEmploi' );
+	}
+	
     useEffect(() => {
         //initialize datatable
       $(document).ready(function () {
@@ -223,7 +227,7 @@ const Content = () => {
 { !isloading && 
                 <>
                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
-					<a href="#">Historique</a>
+					<a href="#" class="menuBtn" onClick="handleclick"><Folder/>Historique</a>
 				</div>        
                  <div className="col-xl-12 col-sm-12 col-12 mt-2">
                             <div className="card p-2" >
