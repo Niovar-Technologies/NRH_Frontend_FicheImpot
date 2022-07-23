@@ -67,9 +67,6 @@ const FicheImpot = () => {
     );
 }
 
-const handleClick = () =>{
-	history.push( '/fiches-impot/historique' );
-}
 
 const Content = () => {
     const alert = useAlert();
@@ -90,7 +87,9 @@ const Content = () => {
         fetchData();
     }
     
-
+	const handleClick = () =>{
+		history.push( '/fiches-impot/historique' );
+	}
 	
     useEffect(() => {
         //initialize datatable
@@ -228,7 +227,7 @@ const Content = () => {
 { !isloading && 
                 <>
                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
-					&nbsp;<a class="menuBtn" onClick={handleclick}><Folder/>&nbsp;Historique</a>
+					&nbsp;<a class="menuBtn" onClick={handleClick}><Folder/>&nbsp;Historique</a>
 				</div>        
                  <div className="col-xl-12 col-sm-12 col-12 mt-2">
                             <div className="card p-2" >
