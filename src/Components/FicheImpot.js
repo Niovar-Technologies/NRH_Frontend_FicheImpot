@@ -67,6 +67,9 @@ const FicheImpot = () => {
     );
 }
 
+const handleClick = () =>{
+	history.push( '/fiches-impot/historique' );
+}
 
 const Content = () => {
     const alert = useAlert();
@@ -87,9 +90,7 @@ const Content = () => {
         fetchData();
     }
     
-	const handleClick = () =>{
-		history.push( '/fiches-impot/historique' );
-	}
+
 	
     useEffect(() => {
         //initialize datatable
