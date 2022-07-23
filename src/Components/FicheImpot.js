@@ -88,7 +88,7 @@ const Content = () => {
     }
     
 	const handleClick = () =>{
-		history.push( '/fiche/loadEmploi' );
+		history.push( '/fiches-impot/historique' );
 	}
 	
     useEffect(() => {
@@ -227,7 +227,7 @@ const Content = () => {
 { !isloading && 
                 <>
                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
-					&nbsp;<a href="#" class="menuBtn" onClick="handleclick"><Folder/>&nbsp;Historique</a>
+					&nbsp;<a class="menuBtn" onClick={handleclick}><Folder/>&nbsp;Historique</a>
 				</div>        
                  <div className="col-xl-12 col-sm-12 col-12 mt-2">
                             <div className="card p-2" >
