@@ -38,7 +38,7 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 let idEts = ( cookies.get( 'code_entreprise' ) ) ? cookies.get( 'code_entreprise' ) : "2020"; //
-const jourPaie = ( cookies.get( 'dateJourpaie' ) ) ? transform_date( cookies.get( 'dateJourpaie' ) ) : "2022-06-13";
+// const jourPaie = ( cookies.get( 'dateJourpaie' ) ) ? transform_date( cookies.get( 'dateJourpaie' ) ) : "2022-06-13";
 const annee = cookies.get( 'anneeChoisie' ) ? cookies.get( 'anneeChoisie' ) : "2022";
 
 // const annee = 2022;
