@@ -16,7 +16,7 @@ import AlertTemplate from "react-alert-template-basic";
 import { useAlert } from "react-alert";
 
 import {useHistory} from 'react-router-dom';
-
+const history = useHistory();
 //jQuery libraries
  
 // import 'jquery/dist/jquery.min.js';
@@ -87,8 +87,6 @@ const Content = () => {
         setLoading(true);
         fetchData();
     }
-    
-	const history = useHistory();
 	
 	const handleClick = () =>{
 		history.push( '/fiches-impot/historique' );
