@@ -15,6 +15,7 @@ import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import { useAlert } from "react-alert";
 
+import {useHistory} from 'react-router-dom';
 
 //jQuery libraries
  
@@ -87,6 +88,8 @@ const Content = () => {
         fetchData();
     }
     
+	const history = useHistory();
+	
 	const handleClick = () =>{
 		history.push( '/fiches-impot/historique' );
 	}
