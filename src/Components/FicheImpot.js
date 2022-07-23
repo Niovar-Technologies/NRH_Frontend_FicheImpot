@@ -209,12 +209,12 @@ const Content = () => {
                   <div className="col-xl-12 col-sm-12 col-12">
                             <div className="breadcrumb-path ">
                                 <ul className="breadcrumb">
-                                    <li className="breadcrumb-item active"><h3>Fiche d'impot </h3>
+									<li className="breadcrumb-item">Fiche d'impot
                                     </li>
-                                    <li className="breadcrumb-item "> Année  :  {annee} </li>
-                                    <li className="breadcrumb-item "> Nombre employé  :  {total} </li>
+                                    <li className="breadcrumb-item active">Année  :  {annee}</li>
+									<li className="breadcrumb-item "> Nombre employé  :  {total} </li>
                                 </ul>
-                                <h3><ArrowLeft/> retour</h3>
+                                <h3>Fiche d'impot</h3>
                             </div>
                  </div>
                 </>
@@ -222,7 +222,9 @@ const Content = () => {
 
 { !isloading && 
                 <>
-                          
+                <div className="col-xl-12 col-sm-12 col-12 mt-2">
+					<a href="#">Historique</a>
+				</div>        
                  <div className="col-xl-12 col-sm-12 col-12 mt-2">
                             <div className="card p-2" >
                             
