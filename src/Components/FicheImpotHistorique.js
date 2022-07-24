@@ -74,7 +74,7 @@ const Content = () => {
     }
     
 	const handleClick = () => {
-		history.push( '/fiches-impotHistorique' );
+		history.push( '/fiches-impot/historique' );
 	}
 	
 	const history = useHistory();
