@@ -8,6 +8,8 @@ import "./static/css/style.css"
 
 // import TalonPaie from "./Components/TalonPaie";
 import FicheImpot from "./Components/FicheImpot";
+import FicheImpotHistorique from "./Components/FicheImpotHistorique";
+
 const Hello = () => (<div>Hello Niovar!</div>)
 
 import { createBrowserHistory } from 'history'
@@ -16,7 +18,7 @@ const history = createBrowserHistory()
 function App() {
     return (
 		<Router history={history}>
-			<Route exact path='/hello' component={Hello} />
+			<Route exact path='/FicheImpotHistorique' component={Hello} />
 			<Route exact path='/fiches-impot' component={FicheImpot} />
         </Router>
     );
