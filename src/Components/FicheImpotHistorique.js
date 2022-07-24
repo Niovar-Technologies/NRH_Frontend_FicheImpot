@@ -155,7 +155,7 @@ const Content = () => {
                                     <li className="breadcrumb-item "> Année  :  {annee} </li>
                                     <li className="breadcrumb-item "> Nombre employé  :  {total} </li>
                                 </ul>
-                                <h3><ArrowLeft/> Fiches d'impôt</h3>
+                                <h3>Fiches d'impôt</h3>
                             </div>
                  </div>
                 </>
