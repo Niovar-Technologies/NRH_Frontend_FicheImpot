@@ -79,10 +79,6 @@ const Content = () => {
 	
 	const history = useHistory();
 	
-	const handleClick = () =>{
-		history.push( '/fiches-impot/historique' );
-	}
-	
     useEffect(() => {
         //initialize datatable
       $(document).ready(function () {
