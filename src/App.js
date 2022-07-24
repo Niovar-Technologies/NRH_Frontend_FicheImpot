@@ -18,7 +18,7 @@ const history = createBrowserHistory()
 function App() {
     return (
 		<Router history={history}>
-			<Route exact path='/FicheImpotHistorique' component={Hello} />
+			<Route exact path='/fiches-impot/historique' component={FicheImpotHistorique} />
 			<Route exact path='/fiches-impot' component={FicheImpot} />
         </Router>
     );
