@@ -15,7 +15,7 @@ import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import { useAlert } from "react-alert";
 
-
+import {useHistory} from 'react-router-dom';
 //jQuery libraries
  
 // import 'jquery/dist/jquery.min.js';
@@ -75,6 +75,12 @@ const Content = () => {
     
 	const handleClick = () => {
 		history.push( '/fiches-impotHistorique' );
+	}
+	
+	const history = useHistory();
+	
+	const handleClick = () =>{
+		history.push( '/fiches-impot/historique' );
 	}
 	
     useEffect(() => {
@@ -163,7 +169,9 @@ const Content = () => {
 
 { !isloading && 
                 <>
-                          
+                <div className="col-xl-12 col-sm-12 col-12 mt-2">
+					&nbsp;<a class="menuBtn" onClick={handleClick}><Folder/>&nbsp;Historique</a>
+				</div> 
                  <div className="col-xl-12 col-sm-12 col-12 mt-2">
                             <div className="card p-2" >
                             
