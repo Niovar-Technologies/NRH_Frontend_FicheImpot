@@ -21,11 +21,11 @@ import { useAlert } from "react-alert";
 // import 'jquery/dist/jquery.min.js';
  
 //Datatable Modules
-//import "datatables.net-dt/js/dataTables.dataTables"
-//import "datatables.net-dt/css/jquery.dataTables.min.css"
-//import $, { event } from 'jquery'; 
-//import { createGlobalState } from 'react-hooks-global-state';
-//import { Modal } from "react-bootstrap";
+import "datatables.net-dt/js/dataTables.dataTables"
+import "datatables.net-dt/css/jquery.dataTables.min.css"
+import $, { event } from 'jquery'; 
+import { createGlobalState } from 'react-hooks-global-state';
+import { Modal } from "react-bootstrap";
 
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
@@ -150,12 +150,12 @@ const Content = () => {
                   <div className="col-xl-12 col-sm-12 col-12">
                             <div className="breadcrumb-path ">
                                 <ul className="breadcrumb">
-                                    <li className="breadcrumb-item active"><h3>Historique des fiches d'impot envoyé </h3>
+                                    <li className="breadcrumb-item active">Historique des fiches d'impôt envoyés
                                     </li>
                                     <li className="breadcrumb-item "> Année  :  {annee} </li>
                                     <li className="breadcrumb-item "> Nombre employé  :  {total} </li>
                                 </ul>
-                                <h3><ArrowLeft/> retour</h3>
+                                <h3><ArrowLeft/> Fiches d'impôt</h3>
                             </div>
                  </div>
                 </>
