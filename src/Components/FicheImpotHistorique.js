@@ -16,6 +16,7 @@ import AlertTemplate from "react-alert-template-basic";
 import { useAlert } from "react-alert";
 
 import {useHistory} from 'react-router-dom';
+
 //jQuery libraries
  
 // import 'jquery/dist/jquery.min.js';
@@ -27,11 +28,15 @@ import $, { event } from 'jquery';
 import { createGlobalState } from 'react-hooks-global-state';
 import { Modal } from "react-bootstrap";
 
-import Cookies from 'universal-cookie';
-const cookies = new Cookies();
 
 // const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
 const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserFIMicroservices/';
+
+const initialState = { listFile: [], listFileT4: [] } ;
+const { useGlobalState } = createGlobalState(initialState);
+
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
 let idEts = ( cookies.get( 'code_entreprise' ) ) ? cookies.get( 'code_entreprise' ) : "2020"; //
 // const jourPaie = ( cookies.get( 'dateJourpaie' ) ) ? transform_date( cookies.get( 'dateJourpaie' ) ) : "2022-06-13";
@@ -40,9 +45,16 @@ const annee = cookies.get( 'anneeChoisie' ) ? cookies.get( 'anneeChoisie' ) : "2
 // const annee = 2022;
 // const idEts = 1;
 
+class Fichier {
+    constructor(id, fichier, extention, type) {
+      this.id = id;
+      this.fichier = fichier;
+      this.extention = extention;
+      this.type = type;
+    }
+  }
 
-
-const FicheImpotHistorique = () => {
+const FicheImpot = () => {
    
     const options = {
         timeout: 5000,
@@ -58,26 +70,29 @@ const FicheImpotHistorique = () => {
 
 
 const Content = () => {
-	
-	const cookies = new Cookies();
-
     const alert = useAlert();
     const [isloading, setLoading] = useState(true);
     const [loader,setLoader ] = useState(false);
     const [listEmploye, setListEmploye] = useState([]);
     const [total, setTotal] = useState(0);
+    const [listFileArray, setListFileArray] = useGlobalState('listFile');
+    const [listFileT4Array, setListFileT4Array] = useGlobalState('listFileT4');
 
     const [showModal,setShowModal ] = useState(false);
 
     const handleClose = () => {
+        setListFileArray([]);
+        setListFileT4Array([]);
         setShowModal(false);
+        setLoading(true);
+        fetchData();
     }
-    
-	const handleClick = () => {
-		history.push( '/fiches-impot/historique' );
-	}
 	
 	const history = useHistory();
+	
+	const handleClick = () =>{
+		history.push( '/fiches-impot/historique' );
+	}
 	
     useEffect(() => {
         //initialize datatable
@@ -109,7 +124,7 @@ const Content = () => {
       }, []);
 
       const fetchData = async () => {
-        const apiURL =  serverName+'TraiterFicheImpot/historiqueFicheImpot/'; 
+        const apiURL =  serverName+'TraiterFicheImpot/StartTraitementFicheImpot/'; 
         const response = await axios.post(apiURL, {
             idEts: idEts,
             annee: annee,
@@ -124,7 +139,56 @@ const Content = () => {
           });
       }
 
-  
+      const saveAll = async (e) => {
+        var promiseArray = [], promiseArrayT4 = [];
+        for (var i = 0; i < listFileArray.length; i++) {
+            promiseArray.push( sendFileToserver(listFileArray[i]));
+        }
+        for (var i = 0; i < listFileT4Array.length; i++) {
+            promiseArrayT4.push( sendFileToserver(listFileT4Array[i]));
+        } 
+
+        if(promiseArray.concat(promiseArrayT4).length==0){ 
+            alert.info("Aucune fiche d'emploi choisi. ");
+            return;
+        }
+        setLoader(true);
+
+           await  axios.all(promiseArray).then(axios.spread((...responses) => {
+            console.log("test ok");
+            setLoader(false);
+            setShowModal(true);
+            
+          })).catch(errors => {
+            // react on errors.
+            console.log(errors);
+          });
+        
+          //  alert.success("Talons de paie envoyé avec succès.");
+    }
+
+
+    async function sendFileToserver(ficheImpot){
+        const apiURL =  serverName+'TraiterFicheImpot/sendSingleFicheImpot/'; 
+        const formData = new FormData();
+        formData.append("id", ficheImpot.id);
+        formData.append("extention",ficheImpot.extention);
+        formData.append("fichier",ficheImpot.fichier);
+        formData.append("type",ficheImpot.type);
+       const response = await axios.post(apiURL, formData)
+         .then(function (response) {
+          if(response.data.statusCode==1){
+              console.log(response.data.result);
+         }
+         if(response.data.statusCode==-1){
+            console.log(response.data.message);          
+         }
+         })
+         .catch(function (error) {
+             console.log(error);
+         });
+    }
+
     return(
         <div className="page-wrapper">
             <div className="content container-fluid">
@@ -152,12 +216,12 @@ const Content = () => {
                   <div className="col-xl-12 col-sm-12 col-12">
                             <div className="breadcrumb-path ">
                                 <ul className="breadcrumb">
-                                    <li className="breadcrumb-item active">Historique des fiches d'impôt envoyés
+									<li className="breadcrumb-item">Fiche d'impot
                                     </li>
-                                    <li className="breadcrumb-item "> Année  :  {annee} </li>
-                                    <li className="breadcrumb-item "> Nombre employé  :  {total} </li>
+                                    <li className="breadcrumb-item active">Année  :  {annee}</li>
+									<li className="breadcrumb-item "> Nombre employé  :  {total} </li>
                                 </ul>
-                                <h3>Fiches d'impôt</h3>
+                                <h3>Fiche d'impot</h3>
                             </div>
                  </div>
                 </>
@@ -167,7 +231,7 @@ const Content = () => {
                 <>
                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
 					&nbsp;<a class="menuBtn" onClick={handleClick}><Folder/>&nbsp;Historique</a>
-				</div> 
+				</div>        
                  <div className="col-xl-12 col-sm-12 col-12 mt-2">
                             <div className="card p-2" >
                             
@@ -180,7 +244,7 @@ const Content = () => {
                                             <th>Email</th>
                                             <th>Fiche impot</th>
                                             <th>Feuillet T4</th>
-                                        
+                                            <th>Opération</th>                                       
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -192,8 +256,7 @@ const Content = () => {
                                                 <td>{item.employe.matricule} </td>
                                                 <td>{item.employe.nom} {item.employe.prenom}</td>
                                                 <td>{item.employe.email}</td>
-                                                <td>   <ListFicheImpotModal employe={item} type={0} />  </td>                                          
-                                                <td>   <ListFicheImpotModal employe={item}  type={1}/>  </td>
+                                                 <FileForm employe={item}/> 
                                                 </tr> 
                                             )
                                         })}
@@ -202,6 +265,42 @@ const Content = () => {
                                 </div>
                             </div>
                         </div>                      
+               
+                <div className="btn-set text-center col-md-12 mt-2">
+                   
+                    {!loader &&  <button  className="btn btn-dwnd" onClick={saveAll} >  <span> <Send/> Envoyés toutes les fiches d'impot </span>   </button>}
+                      
+                    {loader && 
+                     <button  className="btn btn-dwnd"> 
+                       <Oval
+                        height="20"
+                        width="20"
+                        color='#f8f9fa'
+                        ariaLabel='loading'/>
+                      </button>}
+                      
+                    </div>
+
+                    <Modal show={showModal} onHide={handleClose} centered backdrop="static">
+                            <Modal.Header closeLabel="fermer" >
+                            </Modal.Header>
+                            <Modal.Body centered>
+                            <div className="row"> 
+                            <div className="col-md-12 text-center"> 
+                            <div className=" col-md-12 p-0">
+                                 <div className="alert alert-success alert-dismissible fade show" role="alert">
+                                      <Check/>  Envoie des relevés d'emploi  éffectué avec succès.
+                                </div>
+                            </div>
+                             </div>
+                             </div>
+                             <div className="modal-footer ">
+                                <button type="button" className="btn-sm btn-info p-2" onClick={handleClose}> 
+                                 Continuer
+                                 </button>
+                             </div>   
+                            </Modal.Body>
+                        </Modal>
                 </>
                 }
 
@@ -212,92 +311,202 @@ const Content = () => {
     );
 }
 
-
-const ListFicheImpotModal = ({ employe, type }) =>{
-    var libelle = type==1 ? "feuillets T4" : "fiches d'impot";
+const FileForm = ({ employe }) => {
     const [employeItem, setEmployeItem] = useState(employe);
-    const [loading, setLoading] = useState(false);
-    const [listFicheImpot, setListFicheImpot] = useState([]);
-    const [modal,setModal] = useState(false);
-    const modalClose = () => { 
-        setModal(false);
+    const [enableButton,setEnableButton ] = useState(true);
+    const [loader,setLoader ] = useState(false);
+    const alert = useAlert();
+
+    const [listFileArray, setListFileArray] = useGlobalState('listFile');
+    const [listFileT4Array, setListFileT4Array] = useGlobalState('listFileT4');
+
+    const [talonBefore,setTalonBefore ] = useState(null);
+
+    const handleAdd = (talon) => {
+     setListFileArray([...listFileArray, talon]);
     }
+    const handleAddT4 = (talon) => {
+        setListFileT4Array([...listFileT4Array, talon]);
+       }
 
-    const modalShow = () => {
-         setModal(true) ;
-         setLoading(true);
-         fetchData();
-        }
-
-      const fetchData = async () => {
-          console.log(employeItem.id);
-          console.log(type);
-  
-       const apiURL =  serverName+'TraiterFicheImpot/getSingleListFicheImpot/'; 
-          const response = await axios.post(apiURL, {
-            idTraiterFicheImpot: employeItem.id,
-            type: type,
-            })
-            .then(function (response) {
-                console.log(response.data.result);
-              setListFicheImpot(response.data.result);
-              setLoading(false);
-            })
-            .catch(function (error) {
-             setLoading(false);
-            });
+    const handleRemove = (talon) => {
+        const newList = listFileArray.filter((t) => t !== talon);
+        setListFileArray(newList);
       }
 
-    return (
-        <>
-                 <a  className="btn-add" onClick={modalShow}>  <span>  <AlignJustify/> Afficher </span>   </a>
-                 
-                    <Modal show={modal} onHide={modalClose} centered backdrop="static" size="lg" >
-                            <Modal.Header closeLabel="fermer">  <span>Liste des {libelle} envoyé à l'employé <span className="font-weight-bold">{employeItem.employe.nom} </span> </span>     </Modal.Header>
-                            <Modal.Body centered>
-                            <div className="row  p-4"> 
-                            {loading && <div class="container">
-                                    <div class="row justify-content-md-center mt-4">
-                                    <div class="col-md-auto  ">
+
+    const handleRemoveT4 = (talon) => {
+        const newList = listFileT4Array.filter((t) => t !== talon);
+        setListFileT4Array(newList);
+      }
+
+      const handleUpdate = (index, talon) => {
+        const newList = [...listFileArray];
+        newList[index] = talon;
+        setListFileArray(newList);
+      }
+      const handleUpdateT4 = (index, talon) => {
+        const newList = [...listFileT4Array];
+        newList[index] = talon;
+        setListFileT4Array(newList);
+      }
+
+     function verifyExtention(extention) {
+        var val =false;
+        const array = ['pdf', 'docx','png'];
+        
+        const match = array.find(element => {
+          if (element==extention) {
+              val=true;
+            return val;
+          }
+        });   
+         return val;
+    }
+   
+
+    const saveFile = (e, type) => {
+        let obj = type==1 ? listFileT4Array.find(data => data.id === employeItem.id) : listFileArray.find(data => data.id === employeItem.id);
+
+        var fileExtension = e.target.files[0].name.split('.').pop(); 
+        var fileSize = Math.round((e.target.files[0].size / 1024));
+
+        if(fileSize>= 4096){
+            setEnableButton(true);
+            alert.error("Taille fichier recommandée : 4 mo");
+            if(obj!=null) type==1? handleRemoveT4(obj) : handleRemove(obj);
+            e.target.value = null;
+           return;
+        }
+        if(!verifyExtention(fileExtension)){
+            setEnableButton(true);
+            alert.error("Extention non valide.");
+            if(obj!=null) type==1 ? handleRemoveT4(obj) : handleRemove(obj);
+            e.target.value = null;
+           return ;
+        }  
+
+        setEnableButton(false);
+
+        var fichier = new Fichier(employeItem.id, e.target.files[0],fileExtension, type);
+        if(obj!=null){
+            var index_of_item = listFileArray.indexOf(obj)
+            type==1 ? handleUpdateT4(index_of_item, obj): handleUpdate(index_of_item, obj);
+        }else{
+            type==1 ? handleAddT4(fichier) : handleAdd(fichier);
+        }
+      }
+
+     /* const UploadFile = async (e) => {
+        let obj = listFileArray.find(data => data.id === employeItem.id);
+          setLoader(true);
+          const apiURL =  serverName+'TraiterReleverEmploi/sendSingleReleverEmploi/'; 
+           const formData = new FormData();
+           formData.append("id", employeItem.id);
+           formData.append("extention",fileExtension);
+           formData.append("fichier",file);
+          const response = await axios.post(apiURL, formData)
+            .then(function (response) {
+                setLoader(false);
+             if(response.data.statusCode==1){
+                 alert.success(response.data.message);
+                setEmployeItem(response.data.result);
+                if(obj!=null) handleRemove(obj);
+                setEnableButton(true);
+            }
+            if(response.data.statusCode==-1){
+                alert.info(response.data.message);            
+            }
+            })
+            .catch(function (error) {
+                setLoader(false);
+                console.log(error);
+                alert.error("Aucune connexion au serveur.");  
+            });
+      }*/
+
+      const UploadFile = async (e) => {
+
+        setLoader(true);
+
+        var promiseArray = [], promiseArrayT4 = [];
+        for (var i = 0; i < listFileArray.length; i++) {
+            promiseArray.push( sendFileToserver(listFileArray[i]));
+        }
+        for (var i = 0; i < listFileT4Array.length; i++) {
+            promiseArrayT4.push( sendFileToserver(listFileT4Array[i]));
+
+        }
+           await  axios.all(promiseArray.concat(promiseArrayT4)).then(axios.spread((...responses) => {
+            console.log("test ok");        
+            setLoader(false);
+            setEnableButton(true);
+            alert.success("Fiche d'impot envoyé avec succès.");
+
+          })).catch(errors => {
+            setEnableButton(false);
+            // react on errors.
+            console.log(errors);
+          });
+         
+    }
+
+
+    async function sendFileToserver(ficheImpot){
+        const apiURL =  serverName+'TraiterFicheImpot/sendSingleFicheImpot/'; 
+        const formData = new FormData();
+        formData.append("id", ficheImpot.id);
+        formData.append("extention",ficheImpot.extention);
+        formData.append("fichier",ficheImpot.fichier);
+        formData.append("type",ficheImpot.type);
+       const response = await axios.post(apiURL, formData)
+         .then(function (response) {
+          if(response.data.statusCode==1){
+            if(ficheImpot!=null) ficheImpot.type==1 ? handleRemoveT4(ficheImpot) : handleRemove(ficheImpot);
+              console.log(response.data.result);
+         }
+         if(response.data.statusCode==-1){
+            console.log(response.data.message);          
+         }
+         })
+         .catch(function (error) {
+             console.log(error);
+         });
+    }
+  return (
+    <>
+                                <td>
+                                <div className=" form-group mt-3">
+                                    <input type="file" className="form-control" onChange={(e) => {saveFile(e, 0);}} />
+                                </div>
+                                </td>
+                                <td>
+                                <div className=" form-group mt-3">
+                                    <input type="file" className="form-control" onChange={(e) => {saveFile(e, 1);}} />
+                                </div>
+                                </td>
+                                 <td>
+                                    <div className="col-md-12 ">
+                                    <button type="button" className="btn btn-sm btn-info py-2 px-4" disabled={enableButton} onClick={UploadFile}  >
+                                    {!loader  && 
+                                    <span className="mr-2">Envoyer</span>
+                                    } 
+                                    
+                                    {loader && 
                                     <Oval
-                                        height="50"
-                                        width="50"
-                                        color='#f8f9fa'
-                                        ariaLabel='loading'/> 
+                                    height="20"
+                                    width="20"
+                                    color='#f8f9fa'
+                                    ariaLabel='loading'/>}
+                                        </button> 
                                     </div>
 
-                                    </div>
-                                </div> }
-                                {!loading && <div class="container">
-                                    <div class="list-group">
-                                    {listFicheImpot && listFicheImpot.map((item, index) => {
-                                             let total =0;
-                                            var color= (index % 2)==0 ? "#f0f5f5" : "#ffffff";
+                                 </td>
 
-                                            return (
-                                                <a  href={item.chemin} target="_blank" class= {"list-group-item list-group-item-action flex-column align-items-start mt-1 list-group-item"} style={{ backgroundColor:color}} >
-                                                <div class="d-flex w-100 justify-content-between">
-                                                <h5 class="mb-1"><File/>  {libelle} </h5>
-                                                <small class="text-muted">ajouté le {item.created}</small>
-                                                </div>
-                                                <small class="text-muted text-blue">Cliquer ici pour consulter ({item.fileName})</small>
-                                            </a>
-                                            )
-                                        })}
-                                    </div>
-                                       
-                                </div> }
-                        
-                             </div>
-                          
-                             <div  className="modal-footer mt-4 text-right">
-                             <button type="button" className="btn btn-danger p-" onClick={modalClose} > Fermer </button>
-                             </div>   
-                            </Modal.Body>
-                        </Modal>
-        </>
-    );
-
+    </>
+                            
+  );
 }
 
-export default FicheImpotHistorique;
+
+export default FicheImpot;
