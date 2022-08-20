@@ -11,7 +11,7 @@ const devConfig = {
        publicPath: 'https://ficheimpot.niovarpaie.ca/',
     },
     devServer: {
-        port: 8080,
+        port: 8080, 
         host: '0.0.0.0',
         historyApiFallback: {
             index: '/index.html'
