@@ -151,8 +151,7 @@ const Content = () => {
                   <div className="col-xl-12 col-sm-12 col-12">
                             <div className="breadcrumb-path ">
                                 <ul className="breadcrumb">
-                                    <li className="breadcrumb-item active">Historique des fiches d'impôt envoyés
-                                    </li>
+                                    <li className="breadcrumb-item active">Historique des fiches d'impôt envoyés</li>
                                     <li className="breadcrumb-item "> Année  :  {annee} </li>
                                     <li className="breadcrumb-item "> Nombre employé  :  {total} </li>
                                 </ul>
