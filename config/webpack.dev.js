@@ -8,10 +8,10 @@ const devConfig = {
     mode: 'development',
     output: {
 	// publicPath: 'http://localhost:8081/',
-       publicPath: 'http://35.183.210.127:8093/',
+       publicPath: 'https://ficheimpot.niovarpaie.ca/',
     },
     devServer: {
-        port: 8093,
+        port: 8080,
         host: '0.0.0.0',
         historyApiFallback: {
             index: '/index.html'
