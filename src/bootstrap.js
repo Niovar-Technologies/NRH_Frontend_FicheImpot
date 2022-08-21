@@ -16,7 +16,7 @@ const mount = (el) => {
 }
 
 if (process.env.NODE_ENV === 'development') {
-    const devRoot = document.querySelector('#NRH_Frontend_FicheImpot')
+    const devRoot = document.querySelector('#NRH_Frontend_FicheImpot_app')
     if (devRoot) {
         mount(devRoot)
     }
