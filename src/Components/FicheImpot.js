@@ -30,7 +30,11 @@ import { Modal } from "react-bootstrap";
 
 
 // const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
-const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserFIMicroservices/';
+
+let appdomain 	= "https://niovarpaie.ca"; // app domainn
+let lbdomain 	= "https://loadbalancer.niovarpaie.ca"; // load balancer domain
+
+const serverName = lbdomain + '/NiovarRH/UserFIMicroservices/';
 
 const initialState = { listFile: [], listFileT4: [] } ;
 const { useGlobalState } = createGlobalState(initialState);
