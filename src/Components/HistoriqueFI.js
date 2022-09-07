@@ -1,19 +1,15 @@
 import Layout from "../Containers/Layout";
 
-import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, Upload, ArrowLeft} from "react-feather";
+import {Search,Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, ArrowLeft, Calendar, Eye} from "react-feather";
 import {useNavigate} from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
 
 
 import axios from "axios";
 import { useEffect, useState , useRef} from 'react';
-import Badge from 'react-badges'
+
 
 import { Oval } from  'react-loader-spinner';
-
-import { positions, Provider } from "react-alert";
-import AlertTemplate from "react-alert-template-basic";
-import { useAlert } from "react-alert";
 
 
 //jQuery libraries
@@ -25,11 +21,12 @@ import "datatables.net-dt/js/dataTables.dataTables"
 import "datatables.net-dt/css/jquery.dataTables.min.css"
 import $ from 'jquery'; 
 import { createGlobalState } from 'react-hooks-global-state';
-import { Modal } from "react-bootstrap";
+import { serverName } from "../Constante";
 
+import { Space, Table, Tag,  Button, Tooltip, Popconfirm, Input, Spin,  message, Upload , Badge, Modal } from 'antd';
+import 'antd/dist/antd.css';
+import { UploadOutlined, ExclamationCircleOutlined, CheckCircleFilled, CheckCircleOutlined } from '@ant-design/icons';
 
-const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
-//const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserTDPMicroservices/';
 
 
 const annee = 2022;
@@ -37,61 +34,58 @@ const idEts = 1;
 
 
 
+
+
 const HistoriqueRE = () => {
    
-    const options = {
-        timeout: 5000,
-        position: positions.TOP_CENTER
-      };
-      
-    return (
-        <Provider template={AlertTemplate} {...options}> 
-        <Content/>
-        </Provider>
-    );
-}
-
-
-const Content = () => {
-    const alert = useAlert();
     const [isloading, setLoading] = useState(true);
     const [loader,setLoader ] = useState(false);
     const [listEmploye, setListEmploye] = useState([]);
     const [total, setTotal] = useState(0);
 
-    const [showModal,setShowModal ] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    let [filteredData]  = useState();
 
-    const handleClose = () => {
-        setShowModal(false);
-    }
+
+    const columns = [
+        {
+        
+            title: '# employé',
+            key: 'matricule',
+            render: (_, record) => (  <Space>  {record.employe.matricule}</Space> ),
+        },
+        {
+        
+            title: 'Nom complet',
+            key: 'nom',
+            dataIndex: 'nom',
+            render: (_, record) => (  <Space> {record.employe.nom} {record.employe.prenom}</Space> ),
+        },
+
+        {
+        
+            title: 'Email',
+            key: 'email',
+            dataIndex: 'email',
+            render: (_, record) => (  <Space> {record.employe.email}</Space> ),
+        },
+
+        {
+        
+            title: 'Fiche Impot',
+            key: 'impot',
+            render: (_, record) => ( <ListFicheImpot item={record} />  ),
+        },
+        {
+        
+            title: 'Feuillet T4',
+            key: 't4',
+            render: (_, record) => ( <ListFeuilletT4 item={record} />  ),
+        },
+    ] ;
     
     useEffect(() => {
-        //initialize datatable
-      $(document).ready(function () {
-           setTimeout(function(){
-           $('#example').DataTable(
-            {
-                language: {
-                    "emptyTable": "Aucune donnée disponible dans le tableau",
-                    "search": "Rechercher:",
-                    "paginate": {
-                        "first": "Première",
-                        "last": "Dernière",
-                        "next": "Suivante",
-                        "previous": "Précédente"
-                    },
-                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
-                    "infoEmpty": "Affichage de 0 à 0 sur 0 entrées",
-                    "infoFiltered": "(filtrées depuis un total de _MAX_ entrées)",
-                    "lengthMenu": "Afficher _MENU_ entrées",
-                    "zeroRecords": "Aucune entrée correspondante trouvée"
-                }
-            }
-           );
-           } ,1000);
-       });
-       fetchData();
-    
+       fetchData();  
       }, []);
 
       const fetchData = async () => {
@@ -110,6 +104,37 @@ const Content = () => {
           });
       }
 
+
+      const modifiedData= listEmploye.map(({body, ...item})=>({
+        ...item,
+        key : item.id,
+       }) );
+
+       const handleSearch = async (e) => {
+        setSearchText(e.target.value); 
+        if(e.target.value===""){
+            fetchData(); 
+        }
+    
+    } 
+    const globalSearch = async () => {
+        filteredData = modifiedData.filter((value)=>{
+            return(
+                value.employe.matricule.toLowerCase().includes(searchText.toLowerCase()) ||
+                value.employe.nom.toLowerCase().includes(searchText.toLowerCase()) ||
+                value.employe.prenom.toLowerCase().includes(searchText.toLowerCase()) ||
+                value.employe.email.toLowerCase().includes(searchText.toLowerCase())
+            );
+        });
+    
+        setListEmploye(filteredData);
+    } 
+    
+    
+    const clearAll = async () => {
+     setSearchText("");
+    }
+
   
     return(
         <Layout>
@@ -117,22 +142,10 @@ const Content = () => {
         <div className="page-wrapper">
             <div className="content container-fluid">
                <div className="row">
-
                { isloading && 
-
-                    <div class="container">
-                    <div class="row justify-content-md-center mt-4">
-
-                    <div class="col-md-auto  mt-4">
-                    <Oval
-                        height="50"
-                        width="50"
-                        color='#f8f9fa'
-                        ariaLabel='loading'/> 
-                    </div>
-
-                    </div>
-                    </div>
+                 <div className="col-xl-12 col-sm-12 col-12 mb-4 text-center">
+                 <Spin/>
+                 </div>
                 }
 
                 { !isloading &&  
@@ -151,47 +164,27 @@ const Content = () => {
                 </>
                 }
 
-{ !isloading && 
-                <>
-                          
-                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
-                            <div className="card p-2" >
-                            
-                                <div className="table-responsive mt-4">
-                                    <table id="example" className="table  custom-table  no-footer tablenoheader">
-                                        <thead>
-                                        <tr>
-                                            <th># d’employé</th>
-                                            <th>Nom complet</th>
-                                            <th>Email</th>
-                                            <th>Fiche impot</th>
-                                            <th>Feuillet T4</th>
-                                        
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {listEmploye && listEmploye.map((item, index) => {
-                                             let total =0;
-                                            return (
-                                            
-                                                <tr>
-                                                <td>{item.employe.matricule} </td>
-                                                <td>{item.employe.nom} {item.employe.prenom}</td>
-                                                <td>{item.employe.email}</td>
-                                                <td>   <ListFicheImpotModal employe={item} type={0} />  </td>                                          
-                                                <td>   <ListFicheImpotModal employe={item}  type={1}/>  </td>
-                                                </tr> 
-                                            )
-                                        })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>                      
-                </>
-                }
-
-                
+                  <div className="col-xl-12 col-sm-12 col-12 text-right"> 
+                        <Space style={{ marginBottom:16, marginTop:40}} align="center"> 
+                        <Input 
+                        placeholder="Saisir ici"
+                        onChange={handleSearch}
+                        allowClear
+                        value={searchText}
+                        />
+    
+                        <Button icon={<Search size={18} /> } onClick={globalSearch}> </Button>
+                        <Button icon={<Delete size={18} /> } onClick={clearAll}> </Button>
+    
+                        </Space>
+                            <Table
+                            columns={columns}
+                            dataSource= { filteredData && filteredData.length ? filteredData :  modifiedData}
+                            bordered
+                            loading = {isloading}
+                            size="middle"
+                            />
+                    </div>             
                 </div>
             </div>
         </div>
@@ -200,92 +193,210 @@ const Content = () => {
     );
 }
 
-
-const ListFicheImpotModal = ({ employe, type }) =>{
-    var libelle = type==1 ? "feuillets T4" : "fiches d'impot";
-    const [employeItem, setEmployeItem] = useState(employe);
+const ListFicheImpot = ({ item  }) =>{
+    const [employeItem, setEmployeItem] = useState(item);
     const [loading, setLoading] = useState(false);
     const [listFicheImpot, setListFicheImpot] = useState([]);
-    const [modal,setModal] = useState(false);
-    const modalClose = () => { 
-        setModal(false);
-    }
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const modalShow = () => {
-         setModal(true) ;
-         setLoading(true);
-         fetchData();
-        }
+    const showModal = () => {
+        setIsModalVisible(true);
+        fetchData();
+      };
+    
+      const handleCancel = () => {
+        setIsModalVisible(false);
+      };
+
+      const columns = [
+        {
+        
+            title: 'Description ',
+            key: 'description',
+            render: (_, record) => (  <Space> <File size={16}/>   Fiche impot </Space> ),
+        },
+        {
+        
+            title: 'Envoyé le ',
+            key: 'created',
+            dataIndex: 'created',
+            render: (_, record) => (  <Space> <Calendar size={16}/>  {record.created}</Space> ),
+        },
+
+        {
+            align:'center',
+            title: 'Options',
+            key: 'options',
+            render: (_, record) => ( 
+                 <Space> 
+                  <a  href={record.chemin} target="_blank" className="text-white btn-sm btn-secondary enabled"><Eye size={14}/> Voir </a>
+
+            </Space> ),
+        },
+
+  
+    ] ;
 
       const fetchData = async () => {
-          console.log(employeItem.id);
-          console.log(type);
-  
-       const apiURL =  serverName+'TraiterFicheImpot/getSingleListFicheImpot/'; 
-          const response = await axios.post(apiURL, {
-            idTraiterFicheImpot: employeItem.id,
-            type: type,
-            })
-            .then(function (response) {
-                console.log(response.data.result);
-              setListFicheImpot(response.data.result);
-              setLoading(false);
-            })
-            .catch(function (error) {
-             setLoading(false);
-            });
+        setLoading(true);
+        const apiURL =  serverName+'TraiterFicheImpot/getSingleListFicheImpot/'; 
+        const response = await axios.post(apiURL, {
+          idTraiterFicheImpot: employeItem.id,
+          type: 0,
+          })
+          .then(function (response) {
+            setListFicheImpot(response.data.result);
+            setLoading(false);
+          })
+          .catch(function (error) {
+           setLoading(false);
+          });
       }
 
     return (
         <>
-                 <a  className="btn-add" onClick={modalShow}>  <span>  <AlignJustify/> Afficher </span>   </a>
-                 
-                    <Modal show={modal} onHide={modalClose} centered backdrop="static" size="lg" >
-                            <Modal.Header closeLabel="fermer">  <span>Liste des {libelle} envoyé à l'employé <span className="font-weight-bold">{employeItem.employe.nom} </span> </span>     </Modal.Header>
-                            <Modal.Body centered>
-                            <div className="row  p-4"> 
-                            {loading && <div class="container">
-                                    <div class="row justify-content-md-center mt-4">
-                                    <div class="col-md-auto  ">
-                                    <Oval
-                                        height="50"
-                                        width="50"
-                                        color='#f8f9fa'
-                                        ariaLabel='loading'/> 
-                                    </div>
+                 <Button type="primary"  onClick={()=>showModal()}  icon={<AlignJustify size={14}/>} >   Lister  </Button>
 
-                                    </div>
-                                </div> }
-                                {!loading && <div class="container">
-                                    <div class="list-group">
-                                    {listFicheImpot && listFicheImpot.map((item, index) => {
-                                             let total =0;
-                                            var color= (index % 2)==0 ? "#f0f5f5" : "#ffffff";
+                        <Modal
+                            title="Modal 1000px width"
+                            centered
+                            visible={isModalVisible} 
+                            width={1000}
+                            footer={null}
+                            maskClosable={false}
+                            onCancel={handleCancel}
+                            title="Historique des fiches d'impot"
 
-                                            return (
-                                                <a  href={item.chemin} target="_blank" class= {"list-group-item list-group-item-action flex-column align-items-start mt-1 list-group-item"} style={{ backgroundColor:color}} >
-                                                <div class="d-flex w-100 justify-content-between">
-                                                <h5 class="mb-1"><File/>  {libelle} </h5>
-                                                <small class="text-muted">ajouté le {item.created}</small>
-                                                </div>
-                                                <small class="text-muted text-blue">Cliquer ici pour consulter ({item.fileName})</small>
-                                            </a>
-                                            )
-                                        })}
+                        >
+                           <div className="col-xl-12 col-sm-12 col-12 mb-4">
+                            <div className="row">
+                                <div className="col-xl-12 col-sm-12 col-12 ">
+                                    <div className="employee_add">
+                                        <label className="employee_count"><User size={16}/> : {employeItem.employe.nom} {employeItem.employe.prenom}  </label>
+                                        <label className="employee_count">Total : <Tag>{listFicheImpot.length}</Tag> </label>
                                     </div>
-                                       
-                                </div> }
-                        
-                             </div>
-                          
-                             <div  className="modal-footer mt-4 text-right">
-                             <button type="button" className="btn btn-danger p-" onClick={modalClose} > Fermer </button>
-                             </div>   
-                            </Modal.Body>
+                                </div>
+                            </div>
+                           <div className="mt-2">
+
+                                <Table
+                                columns={columns}
+                                dataSource= {listFicheImpot}
+                                bordered
+                                loading = {loading}
+                                size="small"
+                                />
+                            </div>
+                        </div>
+                           
                         </Modal>
         </>
     );
 
 }
+
+
+const ListFeuilletT4 = ({ item  }) =>{
+    const [employeItem, setEmployeItem] = useState(item);
+    const [loading, setLoading] = useState(false);
+    const [listFeuilletT4, setListFeuilletT4] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const showModal = () => {
+        setIsModalVisible(true);
+        fetchData();
+      };
+    
+      const handleCancel = () => {
+        setIsModalVisible(false);
+      };
+
+      const columns = [
+        {
+        
+            title: 'Description ',
+            key: 'description',
+            render: (_, record) => (  <Space> <File size={16}/>   Fiche impot </Space> ),
+        },
+        {
+        
+            title: 'Envoyé le ',
+            key: 'created',
+            dataIndex: 'created',
+            render: (_, record) => (  <Space> <Calendar size={16}/>  {record.created}</Space> ),
+        },
+
+        {
+            align:'center',
+            title: 'Options',
+            key: 'options',
+            render: (_, record) => ( 
+                 <Space> 
+                  <a  href={record.chemin} target="_blank" className="text-white btn-sm btn-secondary enabled"><Eye size={14}/> Voir </a>
+
+            </Space> ),
+        },
+
+  
+    ] ;
+
+      const fetchData = async () => {
+        setLoading(true);
+        const apiURL =  serverName+'TraiterFicheImpot/getSingleListFicheImpot/'; 
+        const response = await axios.post(apiURL, {
+          idTraiterFicheImpot: employeItem.id,
+          type: 1,
+          })
+          .then(function (response) {
+            setListFeuilletT4(response.data.result);
+            setLoading(false);
+          })
+          .catch(function (error) {
+           setLoading(false);
+          });
+      }
+
+    return (
+        <>
+                 <Button type="primary"  onClick={()=>showModal()}  icon={<AlignJustify size={14}/>} >   Lister  </Button>
+
+                        <Modal
+                            title="Modal 1000px width"
+                            centered
+                            visible={isModalVisible} 
+                            width={1000}
+                            footer={null}
+                            maskClosable={false}
+                            onCancel={handleCancel}
+                            title="Historique des fiches de  feuillet T4"
+
+                        >
+                           <div className="col-xl-12 col-sm-12 col-12 mb-4">
+                            <div className="row">
+                                <div className="col-xl-12 col-sm-12 col-12 ">
+                                    <div className="employee_add">
+                                        <label className="employee_count"><User size={16}/> : {employeItem.employe.nom} {employeItem.employe.prenom}  </label>
+                                        <label className="employee_count">Total : <Tag>{listFeuilletT4.length}</Tag> </label>
+                                    </div>
+                                </div>
+                            </div>
+                           <div className="mt-2">
+
+                                <Table
+                                columns={columns}
+                                dataSource= {listFeuilletT4}
+                                bordered
+                                loading = {loading}
+                                size="small"
+                                />
+                            </div>
+                        </div>
+                           
+                        </Modal>
+        </>
+    );
+
+}
+
 
 export default HistoriqueRE;

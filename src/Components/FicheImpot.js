@@ -1,36 +1,23 @@
 
 import Layout from "../Containers/Layout";
 
-import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, Upload, ArrowLeft} from "react-feather";
-import {useNavigate} from "react-router-dom";
-import ReactTooltip from 'react-tooltip';
-
-
+import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, ArrowLeft, Search, Save} from "react-feather";
 import axios from "axios";
 import { useEffect, useState , useRef} from 'react';
-import Badge from 'react-badges'
 
 import { Oval } from  'react-loader-spinner';
-
-import { positions, Provider } from "react-alert";
-import AlertTemplate from "react-alert-template-basic";
-import { useAlert } from "react-alert";
-
-
-//jQuery libraries
- 
-import 'jquery/dist/jquery.min.js';
  
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables"
 import "datatables.net-dt/css/jquery.dataTables.min.css"
-import $, { event } from 'jquery'; 
+
 import { createGlobalState } from 'react-hooks-global-state';
-import { Modal } from "react-bootstrap";
+import { serverName } from "../Constante";
 
-
-const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
-//const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserTDPMicroservices/';
+import { Space, Table, Tag,  Button, Tooltip, Popconfirm, Input, Spin,  message, Upload , Badge, Modal   } from 'antd';
+import 'antd/dist/antd.css';
+import { UploadOutlined, ExclamationCircleOutlined, CheckCircleFilled, CheckCircleOutlined } from '@ant-design/icons';
+const { confirm } = Modal;
 
 const initialState = { listFile: [], listFileT4: [] } ;
 const { useGlobalState } = createGlobalState(initialState);
@@ -48,30 +35,74 @@ class Fichier {
   }
 
 const FicheImpot = () => {
-   
-    const options = {
-        timeout: 5000,
-        position: positions.TOP_CENTER
-      };
-      
-    return (
-        <Provider template={AlertTemplate} {...options}> 
-        <Content/>
-        </Provider>
-    );
-}
-
-
-const Content = () => {
-    const alert = useAlert();
+   // const alert = useAlert();
     const [isloading, setLoading] = useState(true);
-    const [loader,setLoader ] = useState(false);
     const [listEmploye, setListEmploye] = useState([]);
     const [total, setTotal] = useState(0);
     const [listFileArray, setListFileArray] = useGlobalState('listFile');
     const [listFileT4Array, setListFileT4Array] = useGlobalState('listFileT4');
 
+    const [isSend, setIsSend] = useState(false);
+
+    const [searchText, setSearchText] = useState("");
+    let [filteredData]  = useState();
+
     const [showModal,setShowModal ] = useState(false);
+
+    const columns = [
+        {
+        
+            title: '# employé',
+            key: 'matricule',
+            render: (_, record) => (  <Space>  {record.employe.matricule}</Space> ),
+        },
+        {
+        
+            title: 'Nom complet',
+            key: 'nom',
+            dataIndex: 'nom',
+            render: (_, record) => (  <Space> {record.employe.nom} {record.employe.prenom}</Space> ),
+        },
+        {
+        
+            title: "Fiche d'impot",
+            key: 'impot',
+            render: (_, record) => ( 
+            <> 
+                <ModalFicheImpot item={record} /> 
+            </> ),
+            responsive: ['md'],
+            width: '20%',
+        },
+        {
+        
+            title: "Feuillet T4",
+            align:"center",
+            key: 'feuillet',
+            render: (_, record) => (
+             <> 
+                <ModalFeuilleT4 item={record} />
+            </> 
+             ),
+            width: '20%',
+            
+        },
+
+        {
+        
+            title: "Options",
+            align:"center",
+            key: 'options',
+            render: (_, record) => (
+             <> 
+             <ButtonSendRow item={record} />
+               
+            </> 
+             ),
+            
+        },
+
+    ] ;
 
     const handleClose = () => {
         setListFileArray([]);
@@ -82,30 +113,7 @@ const Content = () => {
     }
     
     useEffect(() => {
-        //initialize datatable
-      $(document).ready(function () {
-           setTimeout(function(){
-           $('#example').DataTable(
-            {
-                language: {
-                    "emptyTable": "Aucune donnée disponible dans le tableau",
-                    "search": "Rechercher:",
-                    "paginate": {
-                        "first": "Première",
-                        "last": "Dernière",
-                        "next": "Suivante",
-                        "previous": "Précédente"
-                    },
-                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
-                    "infoEmpty": "Affichage de 0 à 0 sur 0 entrées",
-                    "infoFiltered": "(filtrées depuis un total de _MAX_ entrées)",
-                    "lengthMenu": "Afficher _MENU_ entrées",
-                    "zeroRecords": "Aucune entrée correspondante trouvée"
-                }
-            }
-           );
-           } ,1000);
-       });
+  
        fetchData();
     
       }, []);
@@ -126,6 +134,36 @@ const Content = () => {
           });
       }
 
+      const modifiedData= listEmploye.map(({body, ...item})=>({
+        ...item,
+        key : item.id,
+       }) );
+
+      const handleSearch = async (e) => {
+        setSearchText(e.target.value); 
+        if(e.target.value===""){
+            fetchData(); 
+        }
+    
+    } 
+    const globalSearch = async () => {
+        filteredData = modifiedData.filter((value)=>{
+            return(
+                value.employe.matricule.toLowerCase().includes(searchText.toLowerCase()) ||
+                value.employe.nom.toLowerCase().includes(searchText.toLowerCase()) ||
+                value.employe.prenom.toLowerCase().includes(searchText.toLowerCase()) ||
+                value.employe.email.toLowerCase().includes(searchText.toLowerCase())
+            );
+        });
+    
+        setListEmploye(filteredData);
+    } 
+    
+    
+    const clearAll = async () => {
+     setSearchText("");
+    }
+
       const saveAll = async (e) => {
         var promiseArray = [], promiseArrayT4 = [];
         for (var i = 0; i < listFileArray.length; i++) {
@@ -134,25 +172,32 @@ const Content = () => {
         for (var i = 0; i < listFileT4Array.length; i++) {
             promiseArrayT4.push( sendFileToserver(listFileT4Array[i]));
         } 
-
-        if(promiseArray.concat(promiseArrayT4).length==0){ 
-            alert.info("Aucune fiche d'emploi choisi. ");
-            return;
-        }
-        setLoader(true);
+        setIsSend(true);
 
            await  axios.all(promiseArray).then(axios.spread((...responses) => {
-            console.log("test ok");
-            setLoader(false);
-            setShowModal(true);
-            
+            setIsSend(false);
+            setListFileArray([]);
+            setListFileT4Array([])
+            confirm({
+                title: "Toutes les fiches ont été soumis aux employés avec succès.",
+                icon: <CheckCircleOutlined color="green" />,  
+                okText: "Terminer", 
+                okCancel:false,                  
+                onOk() {
+                    refreshPage();
+                },  
+              });
+          
           })).catch(errors => {
-            // react on errors.
+             message.error("Une erreur est survenu lors de l'envoie groupé. Veuillez réessayez."); 
+            setIsSend(false);
             console.log(errors);
           });
-        
-          //  alert.success("Talons de paie envoyé avec succès.");
     }
+
+    const refreshPage = () => {
+        window.location.reload(); 
+     }
 
 
     async function sendFileToserver(ficheImpot){
@@ -176,6 +221,8 @@ const Content = () => {
          });
     }
 
+
+
     return(
         <Layout>
 
@@ -184,20 +231,9 @@ const Content = () => {
                <div className="row">
 
                { isloading && 
-
-                    <div class="container">
-                    <div class="row justify-content-md-center mt-4">
-
-                    <div class="col-md-auto  mt-4">
-                    <Oval
-                        height="50"
-                        width="50"
-                        color='#f8f9fa'
-                        ariaLabel='loading'/> 
-                    </div>
-
-                    </div>
-                    </div>
+                 <div className="col-xl-12 col-sm-12 col-12 mb-4 text-center">
+                 <Spin/>
+                 </div>
                 }
 
                 { !isloading &&  
@@ -216,82 +252,38 @@ const Content = () => {
                 </>
                 }
 
-{ !isloading && 
-                <>
-                          
-                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
-                            <div className="card p-2" >
-                            
-                                <div className="table-responsive mt-4">
-                                    <table id="example" className="table  custom-table  no-footer tablenoheader">
-                                        <thead>
-                                        <tr>
-                                            <th># d’employé</th>
-                                            <th>Nom complet</th>
-                                            <th>Email</th>
-                                            <th>Fiche impot</th>
-                                            <th>Feuillet T4</th>
-                                            <th>Opération</th>                                       
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {listEmploye && listEmploye.map((item, index) => {
-                                             let total =0;
-                                            return (
-                                            
-                                                <tr>
-                                                <td>{item.employe.matricule} </td>
-                                                <td>{item.employe.nom} {item.employe.prenom}</td>
-                                                <td>{item.employe.email}</td>
-                                                 <FileForm employe={item}/> 
-                                                </tr> 
-                                            )
-                                        })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>                      
-               
-                <div className="btn-set text-center col-md-12 mt-2">
-                   
-                    {!loader &&  <button  className="btn btn-dwnd" onClick={saveAll} >  <span> <Send/> Envoyés toutes les fiches d'impot </span>   </button>}
-                      
-                    {loader && 
-                     <button  className="btn btn-dwnd"> 
-                       <Oval
-                        height="20"
-                        width="20"
-                        color='#f8f9fa'
-                        ariaLabel='loading'/>
-                      </button>}
-                      
-                    </div>
+                    <div className="col-xl-12 col-sm-12 col-12 text-right"> 
+                        <Space style={{ marginBottom:16, marginTop:40}} align="center"> 
+                        <Input 
+                        placeholder="Saisir ici"
+                        onChange={handleSearch}
+                        allowClear
+                        value={searchText}
+                        />
+    
+                        <Button icon={<Search size={18} /> } onClick={globalSearch}> </Button>
+                        <Button icon={<Delete size={18} /> } onClick={clearAll}> </Button>
+    
+                        </Space>
+                            <Table
+                            columns={columns}
+                            dataSource= { filteredData && filteredData.length ? filteredData :  modifiedData}
+                            bordered
+                            loading = {isloading}
+                            size="middle"
+                            />
+                    </div> 
 
-                    <Modal show={showModal} onHide={handleClose} centered backdrop="static">
-                            <Modal.Header closeLabel="fermer" >
-                            </Modal.Header>
-                            <Modal.Body centered>
-                            <div className="row"> 
-                            <div className="col-md-12 text-center"> 
-                            <div className=" col-md-12 p-0">
-                                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                                      <Check/>  Envoie des relevés d'emploi  éffectué avec succès.
-                                </div>
-                            </div>
-                             </div>
-                             </div>
-                             <div className="modal-footer ">
-                                <button type="button" className="btn-sm btn-info p-2" onClick={handleClose}> 
-                                 Continuer
-                                 </button>
-                             </div>   
-                            </Modal.Body>
-                        </Modal>
-                </>
-                }
+                      <div className="col-xl-12 col-sm-12 col-12 text-center"> 
+                    <Popconfirm  disabled={listFileArray.length == 0  && listFileT4Array.length==0 ? true : false} placement="top" title={"Voulez-vous soumettre toutes ces fiches de façon grouper ?"} onConfirm={saveAll}  okText="Oui" cancelText="Non">
 
-                
+                        <Button className="mt-3" type="primary"  disabled={listFileArray.length == 0 && listFileT4Array.length==0 ? true : false}
+                        success icon={<Send size={14} />} size="large" loading={isSend} > 
+                        {isSend ? "Veuillez patientez..." : "Soumettre toutes les fiches selectionner "}  
+                        </Button>
+                    </Popconfirm>
+
+                    </div>                 
                 </div>
             </div>
         </div>
@@ -300,147 +292,252 @@ const Content = () => {
     );
 }
 
-const FileForm = ({ employe }) => {
-    const [employeItem, setEmployeItem] = useState(employe);
-    const [enableButton,setEnableButton ] = useState(true);
-    const [loader,setLoader ] = useState(false);
-    const alert = useAlert();
 
-    const [listFileArray, setListFileArray] = useGlobalState('listFile');
-    const [listFileT4Array, setListFileT4Array] = useGlobalState('listFileT4');
+const ModalFeuilleT4 = ({ item  }) =>{
 
-    const [talonBefore,setTalonBefore ] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [employeItem, setEmployeItem] = useState(item.employe);
+    const [fileList, setFileList] = useState([]);
+    const [colorDot, setColorDot] = useState("#ffffff");
 
-    const handleAdd = (talon) => {
-     setListFileArray([...listFileArray, talon]);
-    }
-    const handleAddT4 = (talon) => {
+  const [listFileT4Array, setListFileT4Array] = useGlobalState('listFileT4');
+
+    const showModal = () => {
+        setIsModalVisible(true);
+      };
+    
+      const handleCancel = () => {
+        let obj = listFileT4Array.find(data => data.id === item.id);  
+        if(obj!=null) handleRemove(obj);
+        setFileList([]);
+        setColorDot("#ffffff");
+        setIsModalVisible(false);
+      };
+
+      const handleAdd = (talon) => {
         setListFileT4Array([...listFileT4Array, talon]);
-       }
+    }
+    const handleRemove = (talon) => {
+        const newList = listFileT4Array.filter((t) => t !== talon);
+        setListFileT4Array(newList);
+      }
+    
+      const handleUpdate = (index, talon) => {
+        const newList = [...listFileT4Array];
+        newList[index] = talon;
+        setListFileT4Array(newList);
+      }
+    
+      const checkOk = async (e) => {
+            if(fileList.length>1){ 
+                message.warning('Impossible de soumettre plusieurs fichiers.'); 
+               return;
+            }
+            var fileSize = Math.round((fileList[0].size / 1024));
+    
+            if(fileSize>= 4096){
+                message.warning("Taille maximal de fichier recommandé : 4 mo");
+               return;
+            }
 
+            setIsModalVisible(false);
+            setColorDot("green");
+
+      }
+    
+      const props = {
+        multiple: true,
+        onRemove: (file) => {
+          const index = fileList.indexOf(file);
+          const newFileList = fileList.slice();
+          newFileList.splice(index, 1);
+          setFileList(newFileList);   
+          let obj = listFileT4Array.find(data => data.id === item.id);  
+          if(obj!=null) handleRemove(obj);
+        },
+        beforeUpload: (file) => {
+          setFileList([...fileList, file]);
+          let obj = listFileT4Array.find(data => data.id === item.id);
+          var fichier = new Fichier(item.id, file,file.name.split('.').pop(),1);
+          if(obj!=null){
+              var index_of_item = listFileT4Array.indexOf(obj)
+              handleUpdate(index_of_item, fichier);
+          }else{
+          handleAdd(fichier);
+          }
+          return false;
+        },
+        fileList,
+      };
+    return (
+        <>
+                 <Badge dot  color={colorDot}>
+                 <Button type="default" onClick={()=>showModal()} icon={<UploadOutlined />}>Choisir feuillet T4 </Button>
+                </Badge>  
+                        <Modal
+                            title="Modal 1000px width"
+                            centered
+                            visible={isModalVisible} 
+                            width={500}
+                            footer={null}
+                            maskClosable={false}
+                            onCancel={handleCancel}
+                            title="Sélectionner un feuillet T4"
+                        >
+                           <div className="col-xl-12 col-sm-12 col-12 mb-4">
+                            <div className="row">
+                                <div className="col-xl-8 col-sm-12">
+      
+                                    <Upload {...props}   accept=".png,.pdf" >
+                                        <Button icon={<UploadOutlined />}>Choisir le fichier</Button>
+                                        </Upload>
+                                
+                                    </div>
+                                    <div className="col-xl-4 col-sm-12">
+                                    <Button
+                                        type="primary"
+                                        disabled={fileList.length === 0}   
+                                        onClick={checkOk} 
+                                        > Continuer
+                                        </Button>
+
+                                
+                                    </div>
+                            </div>
+                        </div>
+                           
+                        </Modal>
+        </>
+    );
+
+}
+
+const ModalFicheImpot = ({ item  }) =>{
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [employeItem, setEmployeItem] = useState(item.employe);
+    const [fileList, setFileList] = useState([]);
+    const [colorDot, setColorDot] = useState("#ffffff");
+
+  const [listFileArray, setListFileArray] = useGlobalState('listFile');
+
+    const showModal = () => {
+        setIsModalVisible(true);
+      };
+    
+      const handleCancel = () => {
+        let obj = listFileArray.find(data => data.id === item.id);  
+        if(obj!=null) handleRemove(obj);
+        setFileList([]);
+        setColorDot("#ffffff");
+        setIsModalVisible(false);
+      };
+
+      const handleAdd = (talon) => {
+        setListFileArray([...listFileArray, talon]);
+    }
     const handleRemove = (talon) => {
         const newList = listFileArray.filter((t) => t !== talon);
         setListFileArray(newList);
       }
-
-
-    const handleRemoveT4 = (talon) => {
-        const newList = listFileT4Array.filter((t) => t !== talon);
-        setListFileT4Array(newList);
-      }
-
+    
       const handleUpdate = (index, talon) => {
         const newList = [...listFileArray];
         newList[index] = talon;
         setListFileArray(newList);
       }
-      const handleUpdateT4 = (index, talon) => {
-        const newList = [...listFileT4Array];
-        newList[index] = talon;
-        setListFileT4Array(newList);
-      }
+    
+      const checkOk = async (e) => {
+            if(fileList.length>1){ 
+                message.warning('Impossible de soumettre plusieurs fichiers.'); 
+               return;
+            }
+            var fileSize = Math.round((fileList[0].size / 1024));
+    
+            if(fileSize>= 4096){
+                message.warning("Taille maximal de fichier recommandé : 4 mo");
+               return;
+            }
 
-     function verifyExtention(extention) {
-        var val =false;
-        const array = ['pdf', 'docx','png'];
-        
-        const match = array.find(element => {
-          if (element==extention) {
-              val=true;
-            return val;
+            setIsModalVisible(false);
+            setColorDot("green");
+
+      }
+    
+      const props = {
+        multiple: true,
+        onRemove: (file) => {
+          const index = fileList.indexOf(file);
+          const newFileList = fileList.slice();
+          newFileList.splice(index, 1);
+          setFileList(newFileList);   
+          let obj = listFileArray.find(data => data.id === item.id);  
+          if(obj!=null) handleRemove(obj);
+        },
+        beforeUpload: (file) => {
+          setFileList([...fileList, file]);
+          let obj = listFileArray.find(data => data.id === item.id);
+          var fichier = new Fichier(item.id, file,file.name.split('.').pop(),0);
+          if(obj!=null){
+              var index_of_item = listFileArray.indexOf(obj)
+              handleUpdate(index_of_item, fichier);
+          }else{
+          handleAdd(fichier);
           }
-        });   
-         return val;
-    }
-   
+          return false;
+        },
+        fileList,
+      };
+    return (
+        <>
+                 <Badge dot  color={colorDot}>
+                 <Button type="default" onClick={()=>showModal()} icon={<UploadOutlined />}>Choisir fiche impot </Button>
+                </Badge>  
+                        <Modal
+                            title="Modal 1000px width"
+                            centered
+                            visible={isModalVisible} 
+                            width={500}
+                            footer={null}
+                            maskClosable={false}
+                            onCancel={handleCancel}
+                            title="Sélectionner une fiche d'impot"
+                        >
+                           <div className="col-xl-12 col-sm-12 col-12 mb-4">
+                            <div className="row">
+                                <div className="col-xl-8 col-sm-12">
+      
+                                    <Upload {...props}   accept=".png,.pdf" >
+                                        <Button icon={<UploadOutlined />}>Choisir le fichier</Button>
+                                        </Upload>
+                                
+                                    </div>
+                                    <div className="col-xl-4 col-sm-12">
+                                    <Button
+                                        type="primary"
+                                        disabled={fileList.length === 0}   
+                                        onClick={checkOk} 
+                                        > Continuer
+                                        </Button>
 
-    const saveFile = (e, type) => {
-        let obj = type==1 ? listFileT4Array.find(data => data.id === employeItem.id) : listFileArray.find(data => data.id === employeItem.id);
+                                
+                                    </div>
+                            </div>
+                        </div>
+                           
+                        </Modal>
+        </>
+    );
 
-        var fileExtension = e.target.files[0].name.split('.').pop(); 
-        var fileSize = Math.round((e.target.files[0].size / 1024));
-
-        if(fileSize>= 4096){
-            setEnableButton(true);
-            alert.error("Taille fichier recommandée : 4 mo");
-            if(obj!=null) type==1? handleRemoveT4(obj) : handleRemove(obj);
-            e.target.value = null;
-           return;
-        }
-        if(!verifyExtention(fileExtension)){
-            setEnableButton(true);
-            alert.error("Extention non valide.");
-            if(obj!=null) type==1 ? handleRemoveT4(obj) : handleRemove(obj);
-            e.target.value = null;
-           return ;
-        }  
-
-        setEnableButton(false);
-
-        var fichier = new Fichier(employeItem.id, e.target.files[0],fileExtension, type);
-        if(obj!=null){
-            var index_of_item = listFileArray.indexOf(obj)
-            type==1 ? handleUpdateT4(index_of_item, obj): handleUpdate(index_of_item, obj);
-        }else{
-            type==1 ? handleAddT4(fichier) : handleAdd(fichier);
-        }
-      }
-
-     /* const UploadFile = async (e) => {
-        let obj = listFileArray.find(data => data.id === employeItem.id);
-          setLoader(true);
-          const apiURL =  serverName+'TraiterReleverEmploi/sendSingleReleverEmploi/'; 
-           const formData = new FormData();
-           formData.append("id", employeItem.id);
-           formData.append("extention",fileExtension);
-           formData.append("fichier",file);
-          const response = await axios.post(apiURL, formData)
-            .then(function (response) {
-                setLoader(false);
-             if(response.data.statusCode==1){
-                 alert.success(response.data.message);
-                setEmployeItem(response.data.result);
-                if(obj!=null) handleRemove(obj);
-                setEnableButton(true);
-            }
-            if(response.data.statusCode==-1){
-                alert.info(response.data.message);            
-            }
-            })
-            .catch(function (error) {
-                setLoader(false);
-                console.log(error);
-                alert.error("Aucune connexion au serveur.");  
-            });
-      }*/
-
-      const UploadFile = async (e) => {
-
-        setLoader(true);
-
-        var promiseArray = [], promiseArrayT4 = [];
-        for (var i = 0; i < listFileArray.length; i++) {
-            promiseArray.push( sendFileToserver(listFileArray[i]));
-        }
-        for (var i = 0; i < listFileT4Array.length; i++) {
-            promiseArrayT4.push( sendFileToserver(listFileT4Array[i]));
-
-        }
-           await  axios.all(promiseArray.concat(promiseArrayT4)).then(axios.spread((...responses) => {
-            console.log("test ok");        
-            setLoader(false);
-            setEnableButton(true);
-            alert.success("Fiche d'impot envoyé avec succès.");
-
-          })).catch(errors => {
-            setEnableButton(false);
-            // react on errors.
-            console.log(errors);
-          });
-         
-    }
+}
 
 
+const ButtonSendRow= ({ item }) => {
+    const [listFileT4Array, setListFileT4Array] = useGlobalState('listFileT4');
+    const [listFileArray, setListFileArray] = useGlobalState('listFile');
+
+    const [loader,setLoader ] = useState(false);
+    
     async function sendFileToserver(ficheImpot){
         const apiURL =  serverName+'TraiterFicheImpot/sendSingleFicheImpot/'; 
         const formData = new FormData();
@@ -451,7 +548,6 @@ const FileForm = ({ employe }) => {
        const response = await axios.post(apiURL, formData)
          .then(function (response) {
           if(response.data.statusCode==1){
-            if(ficheImpot!=null) ficheImpot.type==1 ? handleRemoveT4(ficheImpot) : handleRemove(ficheImpot);
               console.log(response.data.result);
          }
          if(response.data.statusCode==-1){
@@ -462,40 +558,53 @@ const FileForm = ({ employe }) => {
              console.log(error);
          });
     }
+
+    const UploadFile = async (id) => {
+        let obj = listFileArray.find(data => data.id === id); 
+        let objT4 = listFileT4Array.find(data => data.id === id); 
+        console.log("objT4", objT4);
+        console.log("obj", obj);
+
+        if(obj==null && objT4==null) {
+            message.error("Aucun fichier selectionner"); 
+            return;
+        }
+
+           setLoader(true);
+        
+             var promiseArray = [], promiseArrayT4 = [];
+
+            if(obj !=null)   promiseArray.push( sendFileToserver(obj));
+
+            if(objT4 !=null)  promiseArrayT4.push( sendFileToserver(objT4));
+
+           await  axios.all(promiseArray.concat(promiseArrayT4)).then(axios.spread((...responses) => {
+            setLoader(false);
+            const newList = listFileArray.filter((t) => t !== obj);
+            setListFileArray(newList);
+            const newListT4 = listFileT4Array.filter((t) => t !== objT4);
+            setListFileT4Array(newListT4);
+            message.success("Document(s) soumis avec succès.");       
+        
+          })).catch(errors => {
+            setLoader(false);   
+            message.error("Une erreur est survenu lors de l'envoie des documents. Veuillez réessayez.");     
+            console.log(errors);
+          });        
+    }
+   
   return (
     <>
-                                <td>
-                                <div className=" form-group mt-3">
-                                    <input type="file" className="form-control" onChange={(e) => {saveFile(e, 0);}} />
-                                </div>
-                                </td>
-                                <td>
-                                <div className=" form-group mt-3">
-                                    <input type="file" className="form-control" onChange={(e) => {saveFile(e, 1);}} />
-                                </div>
-                                </td>
-                                 <td>
-                                    <div className="col-md-12 ">
-                                    <button type="button" className="btn btn-sm btn-info py-2 px-4" disabled={enableButton} onClick={UploadFile}  >
-                                    {!loader  && 
-                                    <span className="mr-2">Envoyer</span>
-                                    } 
-                                    
-                                    {loader && 
-                                    <Oval
-                                    height="20"
-                                    width="20"
-                                    color='#f8f9fa'
-                                    ariaLabel='loading'/>}
-                                        </button> 
-                                    </div>
+   <Popconfirm  placement="left" title={"Voulez-vous soumettre ces fichiers ?"} onConfirm={()=>UploadFile(item.id)} okText="Oui" cancelText="Non">
 
-                                 </td>
+     <Button loading={loader}  type="primary" icon={<Save size={14} />}>Envoyer </Button>
+     </Popconfirm>
 
     </>
                             
   );
 }
+
 
 
 export default FicheImpot;
