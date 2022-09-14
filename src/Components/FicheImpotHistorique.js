@@ -13,7 +13,7 @@ import { useEffect, useState , useRef} from 'react';
 
 import { Oval } from  'react-loader-spinner';
 
-<<<<<<< HEAD:src/Components/FicheImpotHistorique.js
+
 import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 import { useAlert } from "react-alert";

@@ -1,10 +1,13 @@
 import React from "react";
 
+
 import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, ArrowLeft, Search, Save} from "react-feather";
+
 import axios from "axios";
 import { useEffect, useState , useRef} from 'react';
 
 import { Oval } from  'react-loader-spinner';
+
  
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables"
@@ -13,22 +16,25 @@ import "datatables.net-dt/css/jquery.dataTables.min.css"
 import { createGlobalState } from 'react-hooks-global-state';
 import { serverName } from "../Constante";
 
+
 import { Space, Table, Tag,  Button, Tooltip, Popconfirm, Input, Spin,  message, Upload , Badge, Modal   } from 'antd';
 import 'antd/dist/antd.css';
 import { UploadOutlined, ExclamationCircleOutlined, CheckCircleFilled, CheckCircleOutlined } from '@ant-design/icons';
 const { confirm } = Modal;
 
+
 const initialState = { listFile: [], listFileT4: [] } ;
 const { useGlobalState } = createGlobalState(initialState);
-
-// const annee = 2022;
-// const idEts = 1;
 
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 let idEts = ( cookies.get( 'code_entreprise' ) ) ? cookies.get( 'code_entreprise' ) : "2020"; //
+// const jourPaie = ( cookies.get( 'dateJourpaie' ) ) ? transform_date( cookies.get( 'dateJourpaie' ) ) : "2022-06-13";
 const annee = cookies.get( 'anneeChoisie' ) ? cookies.get( 'anneeChoisie' ) : "2022";
+
+// const annee = 2022;
+// const idEts = 1;
 
 class Fichier {
     constructor(id, fichier, extention, type) {
@@ -116,7 +122,13 @@ const FicheImpot = () => {
         setLoading(true);
         fetchData();
     }
-    
+	
+	const history = useHistory();
+	
+	const handleClick = () =>{
+		history.push( '/fiches-impot/historique' );
+	}
+	
     useEffect(() => {
   
        fetchData();
@@ -229,8 +241,6 @@ const FicheImpot = () => {
 
 
     return(
-        <Layout>
-
         <div className="page-wrapper">
             <div className="content container-fluid">
                <div className="row">
@@ -246,16 +256,17 @@ const FicheImpot = () => {
                   <div className="col-xl-12 col-sm-12 col-12">
                             <div className="breadcrumb-path ">
                                 <ul className="breadcrumb">
-                                    <li className="breadcrumb-item active"><h3>Fiche d'impot </h3>
+									<li className="breadcrumb-item">Fiche d'impot
                                     </li>
-                                    <li className="breadcrumb-item "> Année  :  {annee} </li>
-                                    <li className="breadcrumb-item "> Nombre employé  :  {total} </li>
+                                    <li className="breadcrumb-item active">Année  :  {annee}</li>
+									<li className="breadcrumb-item "> Nombre employé  :  {total} </li>
                                 </ul>
-                                <h3><ArrowLeft/> retour</h3>
+                                <h3>Fiche d'impot</h3>
                             </div>
                  </div>
                 </>
                 }
+
 
                     <div className="col-xl-12 col-sm-12 col-12 text-right"> 
                         <Space style={{ marginBottom:16, marginTop:40}} align="center"> 
@@ -278,7 +289,6 @@ const FicheImpot = () => {
                             size="middle"
                             />
                     </div> 
-
                       <div className="col-xl-12 col-sm-12 col-12 text-center"> 
                     <Popconfirm  disabled={listFileArray.length == 0  && listFileT4Array.length==0 ? true : false} placement="top" title={"Voulez-vous soumettre toutes ces fiches de façon grouper ?"} onConfirm={saveAll}  okText="Oui" cancelText="Non">
 
@@ -292,8 +302,6 @@ const FicheImpot = () => {
                 </div>
             </div>
         </div>
-                      
-    </Layout>
     );
 }
 
