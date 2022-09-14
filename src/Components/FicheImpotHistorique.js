@@ -14,7 +14,7 @@ import { Oval } from  'react-loader-spinner';
 
 //jQuery libraries
  
-import 'jquery/dist/jquery.min.js';
+// import 'jquery/dist/jquery.min.js';
  
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables"
