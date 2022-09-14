@@ -1,10 +1,6 @@
 import React from "react";
 
-<<<<<<< HEAD:src/Components/FicheImpotHistorique.js
-import {Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, Upload, ArrowLeft, Folder} from "react-feather";
-=======
 import {Search,Grid, List, Plus, Check, Delete, Edit, Trash2, Phone, DollarSign, File, BookOpen, CheckCircle, EyeOff , AlertTriangle, UserX, User, UserCheck, ToggleLeft, Clock, Send, X, AlignJustify, ArrowRight, ArrowLeft, Calendar, Eye} from "react-feather";
->>>>>>> 4baaaa27b300f1213a0ca418a6fe802276f4498f:src/Components/HistoriqueFI.js
 import {useNavigate} from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
 
@@ -15,74 +11,32 @@ import { useEffect, useState , useRef} from 'react';
 
 import { Oval } from  'react-loader-spinner';
 
-<<<<<<< HEAD:src/Components/FicheImpotHistorique.js
-import { positions, Provider } from "react-alert";
-import AlertTemplate from "react-alert-template-basic";
-import { useAlert } from "react-alert";
 
-import {useHistory} from 'react-router-dom';
-=======
-
->>>>>>> 4baaaa27b300f1213a0ca418a6fe802276f4498f:src/Components/HistoriqueFI.js
 //jQuery libraries
  
-// import 'jquery/dist/jquery.min.js';
+import 'jquery/dist/jquery.min.js';
  
 //Datatable Modules
 import "datatables.net-dt/js/dataTables.dataTables"
 import "datatables.net-dt/css/jquery.dataTables.min.css"
-import $, { event } from 'jquery'; 
+import $ from 'jquery'; 
 import { createGlobalState } from 'react-hooks-global-state';
 import { serverName } from "../Constante";
 
-<<<<<<< HEAD:src/Components/FicheImpotHistorique.js
-import Cookies from 'universal-cookie';
-const cookies = new Cookies();
-
-// const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
-const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserFIMicroservices/';
-=======
 import { Space, Table, Tag,  Button, Tooltip, Popconfirm, Input, Spin,  message, Upload , Badge, Modal } from 'antd';
 import 'antd/dist/antd.css';
 import { UploadOutlined, ExclamationCircleOutlined, CheckCircleFilled, CheckCircleOutlined } from '@ant-design/icons';
 
->>>>>>> 4baaaa27b300f1213a0ca418a6fe802276f4498f:src/Components/HistoriqueFI.js
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
 let idEts = ( cookies.get( 'code_entreprise' ) ) ? cookies.get( 'code_entreprise' ) : "2020"; //
 const annee = cookies.get( 'anneeChoisie' ) ? cookies.get( 'anneeChoisie' ) : "2022";
 
-// const annee = 2022;
-// const idEts = 1;
-
-
-
-<<<<<<< HEAD:src/Components/FicheImpotHistorique.js
-const FicheImpotHistorique = () => {
-   
-    const options = {
-        timeout: 5000,
-        position: positions.TOP_CENTER
-      };
-      
-    return (
-        <Provider template={AlertTemplate} {...options}> 
-        <Content/>
-        </Provider>
-    );
-}
-
-
-const Content = () => {
-	
-	const cookies = new Cookies();
-
-    const alert = useAlert();
-=======
 
 
 const HistoriqueRE = () => {
    
->>>>>>> 4baaaa27b300f1213a0ca418a6fe802276f4498f:src/Components/HistoriqueFI.js
     const [isloading, setLoading] = useState(true);
     const [loader,setLoader ] = useState(false);
     const [listEmploye, setListEmploye] = useState([]);
@@ -129,12 +83,6 @@ const HistoriqueRE = () => {
         },
     ] ;
     
-	const handleClick = () => {
-		history.push( '/fiches-impot/historique' );
-	}
-	
-	const history = useHistory();
-	
     useEffect(() => {
        fetchData();  
       }, []);
@@ -188,6 +136,8 @@ const HistoriqueRE = () => {
 
   
     return(
+        <Layout>
+
         <div className="page-wrapper">
             <div className="content container-fluid">
                <div className="row">
@@ -202,61 +152,17 @@ const HistoriqueRE = () => {
                   <div className="col-xl-12 col-sm-12 col-12">
                             <div className="breadcrumb-path ">
                                 <ul className="breadcrumb">
-                                    <li className="breadcrumb-item active">Historique des fiches d'impôt envoyés</li>
+                                    <li className="breadcrumb-item active"><h3>Historique des fiches d'impot envoyé </h3>
+                                    </li>
                                     <li className="breadcrumb-item "> Année  :  {annee} </li>
                                     <li className="breadcrumb-item "> Nombre employé  :  {total} </li>
                                 </ul>
-                                <h3>Fiches d'impôt</h3>
+                                <h3><ArrowLeft/> retour</h3>
                             </div>
                  </div>
                 </>
                 }
 
-<<<<<<< HEAD:src/Components/FicheImpotHistorique.js
-{ !isloading && 
-                <>
-                <div className="col-xl-12 col-sm-12 col-12 mt-2">
-					&nbsp;<a class="menuBtn" onClick={handleClick}><Folder/>&nbsp;Historique</a>
-				</div> 
-                 <div className="col-xl-12 col-sm-12 col-12 mt-2">
-                            <div className="card p-2" >
-                            
-                                <div className="table-responsive mt-4">
-                                    <table id="example" className="table  custom-table  no-footer tablenoheader">
-                                        <thead>
-                                        <tr>
-                                            <th># d’employé</th>
-                                            <th>Nom complet</th>
-                                            <th>Email</th>
-                                            <th>Fiche impot</th>
-                                            <th>Feuillet T4</th>
-                                        
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {listEmploye && listEmploye.map((item, index) => {
-                                             let total =0;
-                                            return (
-                                            
-                                                <tr>
-                                                <td>{item.employe.matricule} </td>
-                                                <td>{item.employe.nom} {item.employe.prenom}</td>
-                                                <td>{item.employe.email}</td>
-                                                <td>   <ListFicheImpotModal employe={item} type={0} />  </td>                                          
-                                                <td>   <ListFicheImpotModal employe={item}  type={1}/>  </td>
-                                                </tr> 
-                                            )
-                                        })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>                      
-                </>
-                }
-
-                
-=======
                   <div className="col-xl-12 col-sm-12 col-12 text-right"> 
                         <Space style={{ marginBottom:16, marginTop:40}} align="center"> 
                         <Input 
@@ -278,10 +184,11 @@ const HistoriqueRE = () => {
                             size="middle"
                             />
                     </div>             
->>>>>>> 4baaaa27b300f1213a0ca418a6fe802276f4498f:src/Components/HistoriqueFI.js
                 </div>
             </div>
         </div>
+                      
+    </Layout>
     );
 }
 
@@ -386,9 +293,6 @@ const ListFicheImpot = ({ item  }) =>{
     );
 
 }
-<<<<<<< HEAD:src/Components/FicheImpotHistorique.js
-export default FicheImpotHistorique;
-=======
 
 
 const ListFeuilletT4 = ({ item  }) =>{
@@ -495,4 +399,3 @@ const ListFeuilletT4 = ({ item  }) =>{
 
 
 export default HistoriqueRE;
->>>>>>> 4baaaa27b300f1213a0ca418a6fe802276f4498f:src/Components/HistoriqueFI.js
