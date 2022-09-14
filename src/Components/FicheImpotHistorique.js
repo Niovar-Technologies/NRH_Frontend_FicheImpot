@@ -36,7 +36,7 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 // const serverName = 'http://localhost:5000/NiovarRH/UserFIMicroservices/';
-const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserFIMicroservices/';
+// const serverName = 'http://nrhloadbalancer03-1908089206.ca-central-1.elb.amazonaws.com/NiovarRH/UserFIMicroservices/';
 
 import { Space, Table, Tag,  Button, Tooltip, Popconfirm, Input, Spin,  message, Upload , Badge, Modal } from 'antd';
 import 'antd/dist/antd.css';
