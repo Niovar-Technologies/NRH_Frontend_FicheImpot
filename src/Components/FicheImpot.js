@@ -16,7 +16,7 @@ import "datatables.net-dt/css/jquery.dataTables.min.css"
 
 import { createGlobalState } from 'react-hooks-global-state';
 import { serverName } from "../Constante";
-
+import { domainName } from "../Constante";
 
 import { Space, Table, Tag,  Button, Tooltip, Popconfirm, Input, Spin,  message, Upload , Badge, Modal   } from 'antd';
 import 'antd/dist/antd.css';
@@ -128,6 +128,10 @@ const FicheImpot = () => {
 	
 	const handleClick = () =>{
 		history.push( '/fiches-impot/historique' );
+	}
+	
+	const handleClickHistorique = () => {
+		location.href = domainName + "/releves-emploi/historique";
 	}
 	
     useEffect(() => {
@@ -271,6 +275,7 @@ const FicheImpot = () => {
 
                     <div className="col-xl-12 col-sm-12 col-12 text-right"> 
                         <Space style={{ marginBottom:16, marginTop:40}} align="center"> 
+						<a onClick={handleClickHistorique} >Historique</a>&nbsp;
                         <Input 
                         placeholder="Saisir ici"
                         onChange={handleSearch}
