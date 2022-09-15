@@ -126,12 +126,9 @@ const FicheImpot = () => {
 	
 	const history = useHistory();
 	
-	const handleClick = () =>{
-		history.push( '/fiches-impot/historique' );
-	}
-	
+
 	const handleClickHistorique = () => {
-		location.href = domainName + "/releves-emploi/historique";
+		location.href = domainName + "/fiches-impot/historique";
 	}
 	
     useEffect(() => {
